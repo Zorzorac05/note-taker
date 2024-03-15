@@ -3,12 +3,12 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 let noteData = require('./db/db.json');
-//const uuid = require('./helpers/uuid');
 
 const PORT = process.env.PORT || 3001;
 
 const app = express();
 
+//middleware
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -34,14 +34,14 @@ app.delete(`/api/notes/:id`, (req, res) => {
     } else {
       // Convert string into JSON object
       let parsedNotes = JSON.parse(data);
-      
+
+      //filer to get rid of the deleted note
       parsedNotes = parsedNotes.filter(function( obj ) {
         return obj.id !== req.params.id;
       });
-      console.log(parsedNotes);
       noteData = parsedNotes;
 
-      // Write updated reviews back to the file
+      // Write updated note list back to the file
       fs.writeFile(
         './db/db.json',
         JSON.stringify(parsedNotes, null, 4),
@@ -54,6 +54,7 @@ app.delete(`/api/notes/:id`, (req, res) => {
   });
 });
 
+//write new notes to json
 app.post('/api/notes', (req, res) => {
   // Log that a POST request was received
   console.info(`${req.method} request received to add a review`);
@@ -80,7 +81,7 @@ app.post('/api/notes', (req, res) => {
         //updates note data with changes to json file
         noteData = parsedNotes;
 
-        // Write updated reviews back to the file
+        // Write updated notes back to the file
         fs.writeFile(
           './db/db.json',
           JSON.stringify(parsedNotes, null, 4),
